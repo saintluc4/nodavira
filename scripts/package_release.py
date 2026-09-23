@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCUMENTS = ['README.md', 'METHODOLOGY.md', 'TESTING.md', 'THIRD_PARTY_NOTICES.md', 'BRAND.md', 'CONTRIBUTING.md',
              'requirements.txt', 'requirements-lock.txt', 'requirements-build.txt']
 SOURCE_FILES = DOCUMENTS + ['LICENSE', '.gitignore', '.gitattributes', 'app.py', 'build.py', 'build.ps1']
-SOURCE_DIRECTORIES = ['nodavira', 'static', 'tests', 'scripts', 'packaging', 'licenses', 'brand', '.github']
+SOURCE_DIRECTORIES = ['nodavira', 'static', 'tests', 'scripts', 'packaging', 'licenses', 'brand', 'docs', '.github']
 
 
 def source_files(root=ROOT):
