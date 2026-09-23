@@ -1,0 +1,23 @@
+name: Sugerir uma melhoria
+description: Proponha uma mudança no aplicativo ou na metodologia.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qual problema a melhoria resolve?
+      description: Descreva seu cenário de uso e a limitação atual.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+      description: Explique o comportamento desejado. Para mudanças de medição, descreva como comparar e validar os resultados.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas e referências
+      description: Opcional. Inclua padrões, documentação oficial ou exemplos que ajudem a avaliar a proposta.

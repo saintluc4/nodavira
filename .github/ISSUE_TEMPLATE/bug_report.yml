@@ -1,0 +1,40 @@
+name: Relatar um problema
+description: Informe um erro na interface, nas consultas ou na compilação.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Revise os dados antes de enviar. Não publique arquivos session*.json: eles contêm acesso à API local. Relatórios e HAR podem conter dados da sua rede e navegação.
+  - type: input
+    id: version
+    attributes:
+      label: Versão do Nodavira
+      placeholder: "Ex.: 0.3.2, executável da Release ou execução pelo código"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Ambiente
+      placeholder: "Ex.: Windows 11 x64; rede Wi-Fi; transporte IPv4"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Como reproduzir
+      description: Liste os passos. Para erros de consulta, informe protocolo, família de transporte e um domínio público de exemplo.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: O que esperava e o que aconteceu
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências opcionais
+      description: Inclua mensagens de erro ou capturas sem dados pessoais. Remova tokens, caminhos pessoais e domínios privados.
