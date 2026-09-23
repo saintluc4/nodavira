@@ -6,11 +6,17 @@
 
 **[Baixar Nodavira.exe](https://github.com/saintluc4/nodavira/releases/latest/download/Nodavira.exe)** · [Versões e requisitos](https://github.com/saintluc4/nodavira/releases) · [Reportar um problema](https://github.com/saintluc4/nodavira/issues/new/choose)
 
-O Nodavira mede o tempo e a confiabilidade das consultas DNS a partir da sua conexão, usando um conjunto de nomes que você pode personalizar. Ele considera primeira passagem, consultas repetidas, respostas lentas e falhas, com uma metodologia explícita e dados exportáveis.
+Desenvolvi o Nodavira para comparar resolvedores DNS a partir da conexão em que eles serão utilizados. Meu objetivo é medir latência, variação e falhas com um conjunto de consultas conhecido, mantendo a metodologia e os resultados disponíveis para análise.
 
-O programa abre em uma **janela própria do Windows**, não altera o DNS do sistema e não exige uma instalação de Python para usar o executável. A interface, a identidade visual e o motor de medição foram desenvolvidos neste projeto. As bibliotecas utilizadas estão identificadas nos avisos de terceiros.
+Adotei consultas diretas aos resolvedores, suporte a transportes criptografados e uma lista de domínios personalizável. O aplicativo executa localmente, abre em uma **janela própria do Windows** e não modifica a configuração DNS do sistema. Disponibilizo o código, a documentação e os recursos visuais neste repositório. As bibliotecas utilizadas estão identificadas nos avisos de terceiros.
 
-**Versão:** `0.3.2`, em desenvolvimento inicial. O ranking é exploratório; não certifica a qualidade de um provedor nem prevê seu desempenho futuro.
+**Versão atual: `0.3.2`.** O projeto está em desenvolvimento inicial. Trato o ranking como uma comparação exploratória das condições observadas durante o teste; ele não certifica a qualidade de um provedor nem prevê seu desempenho futuro.
+
+## Interface
+
+![Tela inicial do Nodavira com seleção de perfil, indicadores de latência e painel de comparação de servidores DNS](docs/images/interface.jpg)
+
+*Captura real da interface da versão 0.3.2, antes de iniciar uma medição. Os indicadores são preenchidos durante o teste. A mesma interface é utilizada na janela Windows e no modo navegador.*
 
 ## Usar, estudar ou contribuir
 
@@ -22,11 +28,11 @@ O programa abre em uma **janela própria do Windows**, não altera o DNS do sist
 | Entender a medição | Leia a seção Metodologia abaixo e [`METHODOLOGY.md`](METHODOLOGY.md) |
 | Compilar ou contribuir | Siga [`CONTRIBUTING.md`](CONTRIBUTING.md) |
 
-O executável é a entrega para uso imediato. O repositório contém os arquivos necessários para estudar, modificar, testar e compilar o projeto.
+Distribuo o executável nas Releases para uso imediato. Mantenho no repositório os arquivos necessários para estudar, modificar, testar e compilar o projeto.
 
 ## Identidade
 
-**Nodavira · Clareza em cada consulta.** O símbolo, o lettering vetorial e a paleta têm arquivos editáveis no repositório. O mesmo ícone identifica a janela e o executável. Consulte o [guia de identidade](BRAND.md) para os arquivos, a construção e a geração das versões SVG/ICO.
+Mantive o símbolo, o lettering vetorial e a paleta em arquivos editáveis. O mesmo ícone identifica a janela e o executável. Documentei os arquivos, a construção e a geração das versões SVG/ICO no [guia de identidade](BRAND.md).
 
 ## Recursos
 
@@ -45,7 +51,7 @@ O executável é a entrega para uso imediato. O repositório contém os arquivos
 
 ## Usar o executável
 
-Baixe somente **`Nodavira.exe`** nos anexos da seção **Releases** do repositório. Esse é o arquivo destinado ao usuário final: não é necessário baixar ZIP, código-fonte, Python ou pastas de bibliotecas.
+Para utilizar o aplicativo, baixe **[Nodavira.exe](https://github.com/saintluc4/nodavira/releases/latest/download/Nodavira.exe)**. O executável inclui o interpretador Python e as bibliotecas do projeto; não é necessário baixar o código-fonte ou instalar Python.
 
 1. Salve `Nodavira.exe` em uma pasta com permissão de escrita.
 2. Abra o arquivo com dois cliques.
@@ -56,7 +62,7 @@ Baixe somente **`Nodavira.exe`** nos anexos da seção **Releases** do repositó
 
 ### Requisitos
 
-- **Windows x64**. A compilação foi verificada em Windows 10 x64; outras versões e arquiteturas não foram validadas.
+- **Windows x64**. Validei a distribuição em Windows 10 x64; outras versões e arquiteturas não foram verificadas.
 - **Microsoft Edge WebView2 Runtime** para a janela integrada. [Download oficial do WebView2](https://developer.microsoft.com/microsoft-edge/webview2/).
 - **.NET Framework 4.6.2 ou superior**, utilizado pelo componente de janela.
 - Conectividade com os resolvedores selecionados; IPv6 funcional para testes de transporte IPv6.
@@ -69,15 +75,15 @@ Se a janela integrada não estiver disponível, é possível abrir a mesma inter
 .\Nodavira.exe --browser
 ```
 
-O arquivo não tem assinatura digital de editor. Para conferir sua integridade, compare o resultado abaixo com o SHA-256 publicado na descrição da Release pelo mantenedor:
+O executável não possui assinatura digital de editor. Publico seu SHA-256 na descrição de cada Release. Para conferir a integridade do arquivo baixado, compare esse hash com o resultado do comando:
 
 ```powershell
 Get-FileHash .\Nodavira.exe -Algorithm SHA256
 ```
 
-## Funcionamento
+## Arquitetura
 
-A interface HTML/CSS/JavaScript é exibida dentro de uma janela **pywebview + WebView2**. O motor Python roda no próprio computador. A comunicação usa uma API HTTP autenticada em `127.0.0.1`, numa porta temporária; a interface não depende de um site hospedado.
+Separei a aplicação em um motor Python de medição e uma interface HTML/CSS/JavaScript. Na distribuição Windows, a interface é exibida por **pywebview + WebView2**. A comunicação com o motor utiliza uma API HTTP autenticada em `127.0.0.1`, numa porta temporária. Os arquivos da interface são locais e não dependem de um site hospedado.
 
 ```text
 Janela Windows / WebView2
@@ -91,7 +97,7 @@ Motor Python de benchmark
            +---- TLS ---------> resolvedor selecionado
 ```
 
-As ações de benchmark usam a API HTTP local; nenhum objeto `js_api` do aplicativo é exposto à página. A API exige token e verifica origem e cabeçalho Host. Fechar a janela solicita o cancelamento do teste, aguarda as consultas em andamento dentro de limites e encerra o servidor.
+As ações de benchmark usam a API HTTP local. Não exponho objetos Python à página por meio de `js_api`. A API exige token e verifica a origem e o cabeçalho Host. Ao fechar a janela, o processo solicita o cancelamento da medição, aguarda as operações em andamento dentro dos limites previstos e encerra o servidor.
 
 ### Configuração padrão
 
@@ -112,6 +118,8 @@ O volume planejado é `servidores × domínios × tipos × passagens`. Por exemp
 
 ## Metodologia
 
+Documentei abaixo as regras que determinam as amostras e o ranking. Os detalhes complementares estão em [`METHODOLOGY.md`](METHODOLOGY.md).
+
 ### 1. Sondagem e preparação
 
 O programa registra parâmetros e semente aleatória. Cada faixa de concorrência consulta `example.com A` para verificar conectividade e abrir conexões. Se todas falharem, uma segunda tentativa usa `iana.org A`. Pelo menos uma resposta considerada válida mantém o servidor no teste.
@@ -122,17 +130,19 @@ As sondagens são registradas separadamente, fora do ranking. Servidores indispo
 
 Todos os servidores disponíveis recebem os mesmos pares domínio/tipo. Em cada passagem, a ordem desses pares é embaralhada e dividida em blocos de até N consultas. Para cada bloco, a ordem dos servidores também é embaralhada.
 
-Um servidor recebe um bloco por vez, com pausa de 50 ms entre lotes. Isso reduz a competição criada pelo próprio teste e parte do viés de ordem, sem eliminar mudanças de rota ou carga da rede. A semente fica no JSON para reproduzir a ordem; ela não reproduz as condições externas.
+Adotei um servidor por vez e uma pausa de 50 ms entre lotes para reduzir a competição provocada pelo próprio benchmark e parte do viés de ordem. Isso não elimina variações de rota, carga ou tráfego externo. A semente fica no JSON e permite reproduzir a ordem das consultas, mas não as condições da rede.
 
 O tempo é medido com `time.perf_counter()`, desde a troca até a recepção e validação básica da resposta. Reconexões e fallback ocorridos nessa operação contam. A criação do objeto da consulta fica fora da medição.
 
 ### 3. Primeira passagem e repetições
 
-**Primeira passagem não significa cache vazio.** As consultas vão diretamente ao IP do resolvedor e não usam o cache DNS local do Windows, mas o provedor pode já ter o nome em cache. Serviços e transportes de um mesmo provedor também podem compartilhar cache.
+Uso os termos primeira passagem e repetições porque **a primeira passagem não comprova cache vazio**. As consultas vão diretamente ao IP do resolvedor e não usam o cache DNS local do Windows, mas o provedor pode já ter o nome em cache. Serviços e transportes de um mesmo provedor também podem compartilhar cache.
 
-As passagens seguintes repetem os mesmos nomes. É provável que alguns dados estejam aquecidos, mas o programa não comprova um cache hit pela latência. Não esvaziamos caches públicos nem usamos subdomínios aleatórios como equivalentes a consultas positivas reais sem cache.
+As passagens seguintes repetem os mesmos nomes. O programa não infere um cache hit apenas pela latência e não controla a permanência dos registros no cache remoto. Não utilizo subdomínios aleatórios como substitutos de consultas positivas reais sem cache.
 
 ### 4. Índice equilibrado
+
+Para combinar latência e falhas, defini um custo para cada amostra:
 
 ```text
 custo de uma resposta válida = latência observada
@@ -142,7 +152,7 @@ custo de uma falha           = máximo(latência observada, timeout configurado)
        + 0,5 × média dos custos das repetições
 ```
 
-**Menor é melhor dentro dessa regra.** A penalidade evita premiar um servidor que recusa consultas rapidamente. O peso das fases permanece 50/50 mesmo com mais repetições. Esse peso é uma escolha do projeto, não uma estimativa da frequência real de cache hits do usuário.
+Dentro dessa regra, um índice menor indica menor custo observado. A penalidade impede que uma recusa rápida seja classificada como uma resposta eficiente. Mantive o peso 50/50 entre as fases mesmo quando há mais repetições; esse peso é uma decisão do projeto, não uma estimativa da frequência de cache hits de cada usuário.
 
 Exemplo: primeira passagem com custo médio de 40 ms e repetições com custo médio de 20 ms produzem índice de 30 ms. Em uma fase com duas respostas de 20 ms e uma falha penalizada em 1.500 ms, o custo médio é `(20 + 20 + 1500) / 3 ≈ 513,3 ms`.
 
@@ -160,7 +170,7 @@ Exemplo: primeira passagem com custo médio de 40 ms e repetições com custo m�
 | Endereço `0.0.0.0` ou `::` | Rotulado `BLOCKED`; falha |
 | Erro TLS/HTTP, timeout, resposta incompatível ou truncamento residual | Falha |
 
-**Leia mediana e P95 junto com as falhas**, pois essas latências excluem as amostras inválidas. Não descartamos outliers ou tentativas lentas, nem apagamos falhas com retentativas silenciosas.
+Não removo outliers, tentativas lentas ou falhas por meio de retentativas silenciosas. Como mediana e P95 excluem amostras inválidas, essas métricas devem ser analisadas junto com o percentual de falhas.
 
 Nomes desativados e políticas de bloqueio podem produzir falhas. O percentual observado não equivale à disponibilidade universal do provedor. Também não são detectados todos os métodos de filtragem ou confirmados todos os IPs retornados.
 
@@ -179,28 +189,30 @@ Certificados e hostname são validados. O bit AD é registrado como declaração
 
 ## Personalizar com TXT ou HAR
 
-A lista padrão é um ponto de partida. Edite-a ou importe um HAR exportado do painel Rede das ferramentas de desenvolvedor do navegador. Apenas os hostnames HTTP/HTTPS são extraídos localmente: caminhos, cookies, cabeçalhos e conteúdo não são enviados ao motor.
+A lista padrão é um ponto de partida. Incluí importação TXT e HAR para permitir que o conjunto de nomes seja adaptado ao uso real. No caso do HAR, a interface extrai localmente apenas os hostnames HTTP/HTTPS. Caminhos, cookies, cabeçalhos e conteúdo não são enviados ao motor.
 
 A importação adapta os nomes consultados; não replica as dependências ou os tempos de carregamento de uma página. Limites: 300 domínios, 32 configurações de servidor, 2–10 passagens, concorrência de 1–8, timeout de 500–5.000 ms, 50.000 consultas por teste e arquivos de até 30 MB.
 
 ## Limitações e interpretação
 
+O propósito do projeto é oferecer uma medição local, documentada e passível de inspeção. Considero os seguintes limites ao interpretar os resultados:
+
 - O resultado depende de conexão, rota, horário, carga e nomes escolhidos. Repita em horários diferentes e evite downloads intensos durante o teste.
-- Não há intervalos de confiança nem teste de significância. Diferenças pequenas e amostras curtas não sustentam uma escolha definitiva.
+- Não calculo intervalos de confiança ou significância estatística. Diferenças pequenas e amostras curtas não sustentam uma escolha definitiva.
 - Não mede velocidade de download, ping de partida, qualidade de streaming, seleção de CDN ou tempo de carregamento de páginas.
 - Não implementa cache recursivo vazio controlado, DoQ, DoH/HTTP3 ou DNSSEC independente.
 - Não detecta interceptação transparente de UDP, DNS64 ou políticas de ECS.
-- Não demonstra superioridade científica sobre outros benchmarks.
+- Não uso os resultados como demonstração de superioridade científica sobre outros benchmarks.
 
 ## Privacidade e dados locais
 
-Não há telemetria, conta online ou recursos da interface carregados de CDN. **As consultas são enviadas aos resolvedores selecionados**, que recebem os nomes testados. DoH e DoT protegem o transporte, mas não escondem a consulta do próprio provedor.
+Não incluí telemetria, conta online ou recursos de interface carregados de serviços externos. **As consultas DNS são enviadas aos resolvedores selecionados**, que recebem os nomes testados. DoH e DoT protegem o transporte, mas não ocultam as consultas do próprio provedor.
 
 JSON e CSV podem conter nomes personalizados, IPs, respostas e parâmetros da rede. `reports/` e `session*.json` ficam fora do Git e do pacote de código-fonte. Não publique arquivos de sessão, pois contêm dados de acesso à API local.
 
 ## Executar pelo código-fonte
 
-Ambiente de referência: Windows x64 e Python 3.13. Abra um terminal na raiz do projeto:
+Utilizo Windows x64 e Python 3.13 como ambiente de referência. Na raiz do projeto:
 
 ```powershell
 py -3.13 -m venv .venv
@@ -232,13 +244,15 @@ Execute em Windows x64 com Python x64, após instalar as dependências acima:
 O PyInstaller empacota interpretador, motor, dependências da janela e interface. São gerados:
 
 ```text
-dist/Nodavira.exe        # Único arquivo a anexar à Release para o usuário final
-dist/SHA256.txt          # Hash para o mantenedor copiar à descrição da Release
+dist/Nodavira.exe        # Aplicativo destinado ao usuário final
+dist/SHA256.txt          # Hash para verificação da distribuição
 ```
 
-As versões são registradas nos arquivos de dependências; isso não garante um binário idêntico byte a byte em ambientes diferentes. O build não assina digitalmente o executável.
+Registro as versões das dependências nos arquivos de requisitos. Isso não garante um executável idêntico byte a byte entre ambientes diferentes. O processo de build não assina digitalmente o arquivo.
 
-## Testes
+## Testes e validação
+
+A versão 0.3.2 foi validada com **38 testes automatizados**. A verificação isolada do executável no Windows 10 x64 concluiu **48/48 consultas válidas** entre UDP, DoH e DoT sobre IPv4/IPv6, além dos controles de exportação, rejeição de certificado com hostname incorreto, cancelamento e encerramento.
 
 ```powershell
 # Testes sem consultas a DNS públicos
@@ -251,7 +265,7 @@ As versões são registradas nos arquivos de dependências; isso não garante um
 .\.venv\Scripts\python.exe scripts/verify_package.py
 ```
 
-Os testes de rede dependem das rotas e permissões locais; a verificação do pacote exige IPv6 funcional e inclui um controle TLS com hostname incorreto. O histórico de validação está em [`TESTING.md`](TESTING.md).
+Os testes de rede dependem das rotas e permissões locais. A verificação do pacote exige IPv6 funcional e inclui um controle TLS com hostname incorreto. Mantenho o registro de validação e suas condições em [`TESTING.md`](TESTING.md).
 
 ## Estrutura
 
@@ -265,30 +279,34 @@ static/                   # Interface em português
 tests/                    # Testes automatizados
 scripts/                  # Verificação, identidade e empacotamento
 brand/                    # Símbolo, lettering e banner editáveis
+docs/images/              # Capturas utilizadas na documentação
 packaging/                # Metadados do executável
 build.py                  # Build da distribuição
 requirements-lock.txt     # Dependências de execução
 requirements-build.txt    # Ferramentas de compilação
 ```
 
-## Publicar no GitHub
+## Distribuição e contribuições
 
-1. Mantenha código, README e metodologia no repositório, respeitando o `.gitignore`.
-2. Crie uma tag, por exemplo `v0.3.2`, e uma **Release** correspondente.
-3. Anexe somente **`dist/Nodavira.exe`** para download pelo usuário final. O executável não precisa fazer parte do histórico do código-fonte.
-4. Na descrição, informe os requisitos, as mudanças, a validação e o hash de `dist/SHA256.txt`.
+Publico o executável em [Releases](https://github.com/saintluc4/nodavira/releases), acompanhado de versão, requisitos, validação e SHA-256. O código e os recursos ficam navegáveis no repositório, separados do binário de distribuição.
 
-Para preparar uma cópia limpa do repositório, execute `python scripts/package_release.py --source`. Extraia **`Nodavira-Source.zip`** e publique seu conteúdo na raiz do repositório público, incluindo os arquivos ocultos como `.gitignore`. Assim, o código e os recursos ficam navegáveis para todos. Esse ZIP usa uma lista explícita: `.deps/`, `.venv/`, `build/`, `dist/`, relatórios e sessões ficam de fora.
+Para gerar uma cópia dos arquivos públicos:
 
-O usuário final continua baixando somente `Nodavira.exe` na Release. Quem quiser o código poderá navegar, clonar ou baixar o repositório. Orientações de contribuição estão em [`CONTRIBUTING.md`](CONTRIBUTING.md).
+```powershell
+.\.venv\Scripts\python.exe scripts/package_release.py --source
+```
 
-### Licenças
+O comando produz `Nodavira-Source.zip` usando uma lista explícita de arquivos e diretórios. Dependências locais, ambientes virtuais, builds, executáveis, relatórios e sessões não entram nesse pacote.
 
-O código, a documentação e os recursos visuais próprios deste repositório são disponibilizados sob a [licença MIT](LICENSE). Ela permite usar, modificar e redistribuir o projeto, inclusive comercialmente, preservando o aviso de copyright e a licença. O texto integral está no arquivo `LICENSE`; a [Open Source Initiative](https://opensource.org/license/mit) também publica o texto da licença.
+Aceito relatos de problemas, propostas de melhoria e pull requests. As orientações de ambiente, testes e contribuição estão em [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+## Licença
+
+Disponibilizo o código, a documentação e os recursos visuais próprios sob a [licença MIT](LICENSE).
 
 As dependências mantêm suas próprias licenças, identificadas em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) e [`licenses/`](licenses/). A licença do projeto e esses avisos também estão incorporados ao executável e podem ser lidos no botão **Licenças** da interface, sem arquivos externos.
 
-## Referências
+## Referências técnicas
 
 - [RFC 8484 — DNS over HTTPS](https://www.rfc-editor.org/rfc/rfc8484)
 - [RFC 7858 — DNS over TLS](https://www.rfc-editor.org/rfc/rfc7858)
