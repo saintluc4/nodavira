@@ -1,0 +1,4 @@
+dnspython==2.8.0
+httpx[http2]==0.28.1
+h2==4.4.1
+pywebview==6.2.1

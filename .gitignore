@@ -1,0 +1,15 @@
+.deps/
+.venv/
+__pycache__/
+*.pyc
+build/
+dist/
+reports/
+*.spec
+session*.json
+*.log
+*.exe
+*.zip
+.pytest_cache/
+.DS_Store
+Thumbs.db
