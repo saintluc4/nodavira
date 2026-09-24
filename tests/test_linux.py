@@ -56,6 +56,7 @@ class LinuxTests(unittest.TestCase):
 
     def test_tar_and_ar_preserve_linux_permissions_and_ownership(self):
         compressed=tar_bytes([('usr/bin/nodavira',b'#!/bin/sh\n',0o755)])
+        self.assertEqual(compressed[9],255)  # host-independent gzip OS byte
         with tarfile.open(fileobj=io.BytesIO(compressed),mode='r:gz') as archive:
             entry=archive.getmember('usr/bin/nodavira')
             self.assertEqual(entry.mode,0o755)
