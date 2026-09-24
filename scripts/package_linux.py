@@ -22,11 +22,6 @@ sys.path.insert(0, str(ROOT))
 from nodavira import __version__
 from scripts.package_release import source_files
 
-ARCH_DEPENDS = ["python>=3.11", "python-dnspython>=2.8", "python-httpx>=0.28",
-                "python-h2>=4.3", "python-pywebview>=6.2.1", "python-gobject",
-                "python-cairo", "gtk3", "webkit2gtk-4.1", "ca-certificates", "xdg-utils"]
-
-
 def normalized(name):
     return re.sub(r"[-_.]+", "-", name).lower()
 
@@ -125,7 +120,12 @@ def tar_bytes(entries, epoch=0):
             info = tarfile.TarInfo(name)
             info.size, info.mode, info.mtime = len(content), mode, epoch
             archive.addfile(info, io.BytesIO(content))
-    return gzip.compress(output.getvalue(), mtime=epoch)
+    # GzipFile fixes the OS header across Python versions/build hosts. In
+    # Python 3.11/3.12 gzip.compress(mtime=0) delegates this byte to zlib.
+    compressed = io.BytesIO()
+    with gzip.GzipFile(filename="", fileobj=compressed, mode="wb", mtime=epoch) as stream:
+        stream.write(output.getvalue())
+    return compressed.getvalue()
 
 
 def ar_bytes(members, epoch=0):
