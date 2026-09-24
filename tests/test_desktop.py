@@ -71,7 +71,7 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(state.snapshot()['desktop'],
                          {'mode':'desktop','renderer':'gtkwebkit2','loaded':True})
         self.assertTrue(ui.options['private_mode'])
-        self.assertTrue(ui.options['icon'].endswith('favicon.svg'))
+        self.assertTrue(ui.options['icon'].endswith('app.png'))
         self.assertFalse(ui.settings['IGNORE_SSL_ERRORS'])
         self.assertNotIn('js_api',ui.creation[1])
         self.assertTrue(ui.window.destroyed.is_set())
