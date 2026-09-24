@@ -1,4 +1,4 @@
-# Metodologia e limites — Nodavira 0.3.2
+# Metodologia e limites — Nodavira 0.4.0
 
 ## O objetivo da comparação
 
@@ -50,7 +50,7 @@ Não há teste de significância, intervalo de confiança ou garantia de estabil
 
 Cache recursivo vazio controlado exigiria infraestrutura autoritativa própria. O aplicativo não força misses usando subdomínios aleatórios de terceiros. Também não mede ping de jogos, disponibilidade de todos os serviços, qualidade de streaming, download, seleção de CDN ou tempo real de carregamento de página. Importar HAR apenas personaliza os nomes consultados; não replica tempos ou dependências da navegação.
 
-Não altera configurações de DNS, não instala serviço do Windows e não usa telemetria.
+Não altera configurações de DNS, não instala serviço de sistema e não usa telemetria.
 
 ## Referências primárias
 
@@ -62,3 +62,7 @@ Não altera configurações de DNS, não instala serviço do Windows e não usa 
 - Quad9, serviços: https://docs.quad9.net/services/
 
 Consultadas em 22/09/2026.
+
+## DNS local no Linux
+
+Um endereço como `127.0.0.53` representa um intermediário local. Nesse caso, a amostra inclui esse serviço e seu cache; não equivale a consultar diretamente o provedor upstream. O programa preserva o endereço configurado e não deduz nem substitui o upstream.

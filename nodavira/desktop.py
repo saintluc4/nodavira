@@ -1,10 +1,11 @@
-"""Windows window host. DNS and exports continue to use the authenticated local API."""
+"""Native window host; DNS and exports use the authenticated local API."""
 import threading
 import sys
 from pathlib import Path
+from .platforms import window_options
 
 
-def run_window(url, state, server_finished, hidden=False, webview_module=None):
+def run_window(url, state, server_finished, hidden=False, webview_module=None, platform=None):
     if webview_module is None:
         import webview as webview_module
     webview = webview_module
@@ -42,7 +43,7 @@ def run_window(url, state, server_finished, hidden=False, webview_module=None):
     try:
         # Refuse legacy IE/EdgeHTML fallback: the app needs a modern web engine.
         assets = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1])) / "static"
-        webview.start(gui="edgechromium", private_mode=True, debug=False, icon=str(assets / "app.ico"))
+        webview.start(**window_options(assets, platform), private_mode=True, debug=False)
     finally:
         closed.set()
         state.stop.set()

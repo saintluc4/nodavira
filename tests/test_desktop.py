@@ -40,7 +40,7 @@ class FakeWebview:
     def start(self, **kwargs):
         self.options=kwargs
         if self.fail: raise RuntimeError('WebView2 unavailable')
-        self.window.events.initialized.fire('edgechromium')
+        self.window.events.initialized.fire('gtkwebkit2' if kwargs['gui']=='gtk' else 'edgechromium')
         self.window.events.loaded.fire()
         if self.shutdown:
             self.shutdown.set()
@@ -53,13 +53,28 @@ class DesktopTests(unittest.TestCase):
     def test_window_loads_without_exposing_custom_python_api(self):
         state=AppState(ROOT/'reports')
         ui=FakeWebview()
-        run_window('http://127.0.0.1:1234/#token=test',state,threading.Event(),webview_module=ui)
+        run_window('http://127.0.0.1:1234/#token=test',state,threading.Event(),webview_module=ui,platform='win32')
         self.assertEqual(state.snapshot()['desktop'],{'mode':'desktop','renderer':'edgechromium','loaded':True})
         self.assertNotIn('js_api',ui.creation[1])
         self.assertEqual(ui.options['gui'],'edgechromium')
         self.assertFalse(ui.settings['IGNORE_SSL_ERRORS'])
         self.assertFalse(ui.settings['ALLOW_FILE_URLS'])
         self.assertTrue(ui.settings['ALLOW_DOWNLOADS'])
+        self.assertTrue(state.stop.is_set())
+
+    def test_linux_window_uses_gtk_and_preserves_security_and_shutdown(self):
+        finished=threading.Event()
+        ui=FakeWebview(shutdown=finished)
+        state=AppState(ROOT/'reports')
+        run_window('http://127.0.0.1:1234/#token=test',state,finished,
+                   hidden=True,webview_module=ui,platform='linux')
+        self.assertEqual(state.snapshot()['desktop'],
+                         {'mode':'desktop','renderer':'gtkwebkit2','loaded':True})
+        self.assertTrue(ui.options['private_mode'])
+        self.assertTrue(ui.options['icon'].endswith('app.png'))
+        self.assertFalse(ui.settings['IGNORE_SSL_ERRORS'])
+        self.assertNotIn('js_api',ui.creation[1])
+        self.assertTrue(ui.window.destroyed.is_set())
         self.assertTrue(state.stop.is_set())
 
     def test_api_shutdown_closes_window(self):

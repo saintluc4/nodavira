@@ -4,6 +4,8 @@ O código do motor, a interface, a metodologia e os recursos visuais estão disp
 
 ## Preparar o ambiente
 
+Para Ubuntu, Mint e Arch, siga o [guia Linux](docs/LINUX.md). O workflow `Linux packages` valida pacotes e janela GTK. As instruções Windows estão abaixo.
+
 Use Windows x64 e Python 3.13. Para a janela integrada, também são necessários WebView2 Runtime e .NET Framework 4.6.2 ou superior.
 
 ```powershell

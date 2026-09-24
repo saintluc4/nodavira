@@ -1,4 +1,14 @@
-# Verificação — Nodavira 0.3.2
+# Verificação — Nodavira
+
+## Portabilidade Linux — código 0.4.0
+
+Em 24/09/2026, os **45 testes automatizados** passaram no ambiente Windows de desenvolvimento. Incluem seleção do renderer GTK, preservação das opções de segurança da janela, encerramento, caminhos XDG, DNS do sistema com stub local, permissões POSIX dos arquivos empacotados e exclusão de dados privados. Os testes da janela nesse conjunto usam um substituto controlado do pywebview; não equivalem à execução real do GTK.
+
+O script `scripts/package_linux.py` gera o pacote Debian com dependências Python fixadas e a receita Arch com checksum. A [execução Linux #2](https://github.com/saintluc4/nodavira/actions/runs/36049583565), em 24/09/2026, aprovou ambos os jobs: Ubuntu 24.04 e Arch. Em cada ambiente foram executados os 45 testes, a construção e instalação do pacote e o teste de integração com janela GTK real em Xvfb. O teste fez quatro consultas válidas a um resolvedor UDP no loopback e verificou autenticação da API, exportações JSON/CSV, gravação no diretório XDG e encerramento do processo instalado.
+
+A primeira execução identificou no Ubuntu a ausência do carregador de SVG do GTK. Corrigi a janela para usar o PNG da própria marca, preservando o SVG editável e a identidade visual. Os testes passaram após essa correção. Testes manuais em Mint/Wayland e outras arquiteturas ainda não foram realizados. O teste de rede controlado no Linux não equivale à verificação de todos os transportes em uma conexão pública; a validação anterior desses transportes no Windows permanece registrada abaixo.
+
+## Histórico Windows — 0.3.2
 
 Executada em 22/09/2026, Windows 10 x64, na conexão local disponível durante o desenvolvimento.
 

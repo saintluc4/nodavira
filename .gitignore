@@ -13,3 +13,6 @@ session*.json
 .pytest_cache/
 .DS_Store
 Thumbs.db
+*.deb
+*.pkg.tar.*
+*.tar.gz

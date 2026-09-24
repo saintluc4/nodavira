@@ -1,0 +1,81 @@
+name: Linux packages
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: linux-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install desktop and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-venv python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-webkit2-4.1 ca-certificates xdg-utils xvfb dbus-x11 desktop-file-utils
+          python3 -m venv --system-site-packages .venv
+          .venv/bin/python -m pip install --no-deps --target build/linux-deps -r requirements-linux-lock.txt
+      - name: Unit tests and Debian package
+        env:
+          PYTHONPATH: build/linux-deps
+        run: |
+          .venv/bin/python -m unittest discover -s tests -v
+          .venv/bin/python scripts/package_linux.py --vendor build/linux-deps
+          dpkg-deb --info dist/linux/*.deb
+          sudo apt-get install -y ./dist/linux/*.deb
+          desktop-file-validate /usr/share/applications/io.github.saintluc4.nodavira.desktop
+      - name: Installed GTK window, benchmark, exports and shutdown
+        env:
+          PYTHONPATH: build/linux-deps
+        run: xvfb-run -a dbus-run-session -- .venv/bin/python scripts/smoke_linux.py --desktop --command /usr/bin/nodavira
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nodavira-ubuntu-mint
+          path: |
+            dist/linux/*.deb
+            dist/linux/*.tar.gz
+            dist/linux/SHA256SUMS
+          if-no-files-found: error
+
+  arch:
+    runs-on: ubuntu-24.04
+    container: archlinux:base-devel
+    steps:
+      - name: Install Arch dependencies
+        run: |
+          pacman -Syu --noconfirm --needed git python python-dnspython python-httpx python-h2 python-pywebview python-gobject python-cairo gtk3 webkit2gtk-4.1 ca-certificates xdg-utils xorg-server-xvfb dbus desktop-file-utils
+      - uses: actions/checkout@v7
+      - name: Build using makepkg as an unprivileged user
+        run: |
+          python scripts/package_linux.py
+          useradd --create-home builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+          runuser -u builder -- bash -c 'cd dist/linux/aur && makepkg --noconfirm && makepkg --printsrcinfo > .SRCINFO'
+          pacman -U --noconfirm dist/linux/aur/*.pkg.tar.zst
+          desktop-file-validate /usr/share/applications/io.github.saintluc4.nodavira.desktop
+      - name: Installed GTK window, benchmark, exports and shutdown
+        run: runuser -u builder -- xvfb-run -a dbus-run-session -- python scripts/smoke_linux.py --desktop --command /usr/bin/nodavira
+      - name: Package checksums
+        run: |
+          cd dist/linux/aur
+          sha256sum *.pkg.tar.zst > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nodavira-arch
+          include-hidden-files: true
+          path: |
+            dist/linux/aur/*.pkg.tar.zst
+            dist/linux/aur/PKGBUILD
+            dist/linux/aur/.SRCINFO
+            dist/linux/aur/SHA256SUMS
+          if-no-files-found: error

@@ -63,6 +63,7 @@ def main():
     icon=icon.resize((256,256),Image.Resampling.LANCZOS)
     icon.save(ROOT/'static/app.ico',sizes=[(n,n) for n in (16,20,24,32,40,48,64,128,256)])
     icon.save(brand/'app-icon.png')
+    icon.save(ROOT/'static/app.png')
 
     # Editable GitHub banner: geometric wordmark rather than a font-based image.
     banner=(f'<rect width="1200" height="360" rx="24" fill="{INK}"/>'
