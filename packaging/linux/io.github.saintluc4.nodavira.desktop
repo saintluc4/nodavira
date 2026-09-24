@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Nodavira
+Comment=Compare DNS resolvers using UDP, DoH and DoT
+Comment[pt_BR]=Compare resolvedores DNS usando UDP, DoH e DoT
+Exec=nodavira
+TryExec=nodavira
+Icon=io.github.saintluc4.nodavira
+Terminal=false
+Categories=Network;Utility;
+Keywords=DNS;benchmark;network;
+StartupNotify=true
