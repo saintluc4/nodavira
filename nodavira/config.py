@@ -75,12 +75,12 @@ def catalog():
             continue
         existing = next((r for r in result if r["address"] == address and r["protocol"] == "udp"), None)
         if existing:
-            existing["policy"] += " · Também configurado no Windows"
+            existing["policy"] += " · Também configurado no sistema"
             continue
         result.insert(index, {"id": f"system-{index}", "name": "DNS do sistema",
                              "address": address, "family": family, "protocol": "udp",
                              "hostname": "", "url": "", "port": 53,
-                             "policy": "Servidor configurado no Windows"})
+                             "policy": "Servidor configurado no sistema"})
     return result
 
 
