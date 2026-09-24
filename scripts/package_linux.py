@@ -92,6 +92,7 @@ def install_tree(destination, vendor=None):
         "packaging/linux/io.github.saintluc4.nodavira.desktop":
             "usr/share/applications/io.github.saintluc4.nodavira.desktop",
         "static/favicon.svg": "usr/share/icons/hicolor/scalable/apps/io.github.saintluc4.nodavira.svg",
+        "static/app.png": "usr/share/icons/hicolor/256x256/apps/io.github.saintluc4.nodavira.png",
         "LICENSE": "usr/share/licenses/nodavira/LICENSE",
         "THIRD_PARTY_NOTICES.md": "usr/share/doc/nodavira/THIRD_PARTY_NOTICES.md",
         "docs/LINUX.md": "usr/share/doc/nodavira/LINUX.md",
