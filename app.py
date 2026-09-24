@@ -1,4 +1,4 @@
-"""Run from source or as the portable Windows executable."""
+"""Run from source, the Windows executable or a Linux desktop package."""
 import sys
 from pathlib import Path
 
@@ -14,19 +14,19 @@ import webbrowser
 
 from nodavira.server import make_server
 from nodavira.desktop import run_window
+from nodavira.platforms import reports_directory, startup_error
 
 
 def main():
     parser = argparse.ArgumentParser(description="Nodavira — benchmark local de DNS")
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument("--no-browser", action="store_true", help="Executar só o servidor, sem janela")
-    modes.add_argument("--browser", action="store_true", help="Abrir no navegador em vez da janela Windows")
+    modes.add_argument("--browser", action="store_true", help="Abrir no navegador em vez da janela do aplicativo")
     parser.add_argument("--port", type=int, default=0)
     parser.add_argument("--session-file", type=Path)
     parser.add_argument("--hidden-window", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
-    output = Path(sys.executable).parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
-    server, state = make_server(ROOT / "static", output / "reports", args.port)
+    server, state = make_server(ROOT / "static", reports_directory(ROOT), args.port)
     url = f"http://127.0.0.1:{server.server_port}/#token={state.token}"
     if args.session_file:
         args.session_file.write_text(json.dumps({"url": url, "port": server.server_port}), encoding="utf-8")
@@ -77,13 +77,10 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as exc:
-        message = ("Não foi possível iniciar o Nodavira.\n\n"
-                   "A janela requer o Microsoft Edge WebView2 Runtime e .NET Framework 4.6.2 ou superior.\n"
-                   "WebView2: https://developer.microsoft.com/microsoft-edge/webview2/\n\n"
-                   "Como alternativa, execute Nodavira.exe --browser.\n\n"
-                   f"Detalhe: {type(exc).__name__}: {exc}")
+        message = startup_error(exc)
         if getattr(sys, "frozen", False) and sys.platform == "win32":
             import ctypes
             ctypes.windll.user32.MessageBoxW(None, message, "Nodavira", 0x10)
         else:
-            raise
+            print(message, file=sys.stderr)
+            sys.exit(1)

@@ -2,15 +2,17 @@
 
 ![Nodavira — Clareza em cada consulta](brand/banner.svg)
 
-**Aplicativo open-source para Windows que compara resolvedores DNS com IPv4, IPv6, DNS over HTTPS e DNS over TLS.**
+**Aplicativo open-source para Windows e Linux que compara resolvedores DNS com IPv4, IPv6, DNS over HTTPS e DNS over TLS.**
 
 **[Baixar Nodavira.exe](https://github.com/saintluc4/nodavira/releases/latest/download/Nodavira.exe)** · [Versões e requisitos](https://github.com/saintluc4/nodavira/releases) · [Reportar um problema](https://github.com/saintluc4/nodavira/issues/new/choose)
 
 Desenvolvi o Nodavira para comparar resolvedores DNS a partir da conexão em que eles serão utilizados. Meu objetivo é medir latência, variação e falhas com um conjunto de consultas conhecido, mantendo a metodologia e os resultados disponíveis para análise.
 
-Adotei consultas diretas aos resolvedores, suporte a transportes criptografados e uma lista de domínios personalizável. O aplicativo executa localmente, abre em uma **janela própria do Windows** e não modifica a configuração DNS do sistema. Disponibilizo o código, a documentação e os recursos visuais neste repositório. As bibliotecas utilizadas estão identificadas nos avisos de terceiros.
+Adotei consultas diretas aos resolvedores, suporte a transportes criptografados e uma lista de domínios personalizável. O aplicativo executa localmente, abre em uma **janela própria** e não modifica a configuração DNS do sistema. Disponibilizo o código, a documentação e os recursos visuais neste repositório. As bibliotecas utilizadas estão identificadas nos avisos de terceiros.
 
-**Versão atual: `0.3.2`.** O projeto está em desenvolvimento inicial. Trato o ranking como uma comparação exploratória das condições observadas durante o teste; ele não certifica a qualidade de um provedor nem prevê seu desempenho futuro.
+**Versão do código: `0.4.0`, com suporte Linux em validação.** A Release Windows previamente publicada é a `0.3.2`. O projeto está em desenvolvimento inicial. Trato o ranking como uma comparação exploratória das condições observadas durante o teste; ele não certifica a qualidade de um provedor nem prevê seu desempenho futuro.
+
+Para **Ubuntu, Linux Mint e Arch**, documentei pacotes, requisitos e compilação no [guia Linux](docs/LINUX.md). O empacotamento Arch inclui um `PKGBUILD`; a publicação no AUR ainda está pendente.
 
 ## Interface
 
@@ -47,7 +49,7 @@ Mantive o símbolo, o lettering vetorial e a paleta em arquivos editáveis. O me
 | Testes personalizados | Servidores, domínios, passagens, concorrência e timeout configuráveis |
 | Importação | TXT ou hostnames extraídos localmente de um HAR |
 | Exportação | JSON completo e CSV com uma linha por consulta |
-| Interface | Português, janela Windows e opção de execução no navegador |
+| Interface | Português, janela Windows/WebView2 ou Linux/GTK e opção de execução no navegador |
 
 ## Usar o executável
 
@@ -86,7 +88,7 @@ Get-FileHash .\Nodavira.exe -Algorithm SHA256
 Separei a aplicação em um motor Python de medição e uma interface HTML/CSS/JavaScript. Na distribuição Windows, a interface é exibida por **pywebview + WebView2**. A comunicação com o motor utiliza uma API HTTP autenticada em `127.0.0.1`, numa porta temporária. Os arquivos da interface são locais e não dependem de um site hospedado.
 
 ```text
-Janela Windows / WebView2
+Janela Windows / WebView2 ou Linux / GTK + WebKitGTK
            |
            | API local autenticada (loopback)
            v
@@ -136,7 +138,7 @@ O tempo é medido com `time.perf_counter()`, desde a troca até a recepção e v
 
 ### 3. Primeira passagem e repetições
 
-Uso os termos primeira passagem e repetições porque **a primeira passagem não comprova cache vazio**. As consultas vão diretamente ao IP do resolvedor e não usam o cache DNS local do Windows, mas o provedor pode já ter o nome em cache. Serviços e transportes de um mesmo provedor também podem compartilhar cache.
+Uso os termos primeira passagem e repetições porque **a primeira passagem não comprova cache vazio**. As consultas vão diretamente ao IP selecionado, mas o provedor pode já ter o nome em cache. Se o IP selecionado for um intermediário local, como `127.0.0.53` no Linux, a medição inclui esse serviço e seu possível cache. Serviços e transportes de um mesmo provedor também podem compartilhar cache.
 
 As passagens seguintes repetem os mesmos nomes. O programa não infere um cache hit apenas pela latência e não controla a permanência dos registros no cache remoto. Não utilizo subdomínios aleatórios como substitutos de consultas positivas reais sem cache.
 
@@ -274,7 +276,8 @@ app.py                    # Inicialização e ciclo de vida
 nodavira/config.py        # Catálogo e validação
 nodavira/engine.py        # Protocolos, agendamento e estatísticas
 nodavira/server.py        # API local, exportação e relatórios
-nodavira/desktop.py       # Janela Windows e WebView2
+nodavira/desktop.py       # Janela Windows/WebView2 ou Linux/GTK
+nodavira/platforms.py     # Renderer e diretório de relatórios por sistema
 static/                   # Interface em português
 tests/                    # Testes automatizados
 scripts/                  # Verificação, identidade e empacotamento
@@ -284,6 +287,8 @@ packaging/                # Metadados do executável
 build.py                  # Build da distribuição
 requirements-lock.txt     # Dependências de execução
 requirements-build.txt    # Ferramentas de compilação
+requirements-linux-lock.txt # Bibliotecas Python do pacote Debian
+scripts/package_linux.py # Pacote Debian, fonte tar.gz e receita Arch
 ```
 
 ## Distribuição e contribuições

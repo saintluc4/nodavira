@@ -28,3 +28,9 @@ O executável inclui Python e bibliotecas de terceiros. Os respectivos direitos 
 A execução usa as versões de `requirements-lock.txt`. As ferramentas de compilação estão em `requirements-build.txt`. Pillow é utilizado apenas para gerar o PNG e o ICO; não faz parte do motor de medição. O código-fonte do aplicativo acompanha a entrega.
 
 O Microsoft Edge WebView2 Runtime e o .NET Framework são pré-requisitos do sistema, instalados separadamente. Não são incorporados ao executável do projeto.
+
+## Distribuição Linux
+
+No Linux, Python, PyGObject, Cairo, GTK 3 e WebKitGTK são fornecidos pelos pacotes do sistema. As licenças e os fontes desses componentes acompanham os respectivos pacotes da distribuição. Não distribuo WebView2, pythonnet, clr_loader ou DLLs do Windows no pacote Linux.
+
+O pacote Debian inclui as bibliotecas Python de `requirements-linux-lock.txt` em uma pasta privada, com os avisos disponíveis em suas distribuições e os textos acima. O pacote Arch usa as dependências do pacman. PyGObject e GTK usam LGPL; WebKitGTK reúne componentes com licenças LGPL, BSD e outros avisos próprios. Consulte [PyGObject](https://pygobject.gnome.org/), [GTK](https://www.gtk.org/) e [WebKitGTK](https://webkitgtk.org/).

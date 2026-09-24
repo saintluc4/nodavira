@@ -1,4 +1,12 @@
-# Verificação — Nodavira 0.3.2
+# Verificação — Nodavira
+
+## Portabilidade Linux — código 0.4.0
+
+Em 24/09/2026, os **45 testes automatizados** passaram no ambiente Windows de desenvolvimento. Incluem seleção do renderer GTK, preservação das opções de segurança da janela, encerramento, caminhos XDG, DNS do sistema com stub local, permissões POSIX dos arquivos empacotados e exclusão de dados privados. Os testes da janela nesse conjunto usam um substituto controlado do pywebview; não equivalem à execução real do GTK.
+
+O script `scripts/package_linux.py` gera o pacote Debian com dependências Python fixadas e a receita Arch com checksum. O workflow `.github/workflows/linux.yml` instala e verifica esses pacotes em Ubuntu e Arch, incluindo a janela GTK real em Xvfb e um resolvedor DNS de teste local. A execução desse workflow ainda precisa ser confirmada; a presença do arquivo não é evidência de aprovação. Testes manuais em Mint/Wayland e outras arquiteturas ainda não foram realizados.
+
+## Histórico Windows — 0.3.2
 
 Executada em 22/09/2026, Windows 10 x64, na conexão local disponível durante o desenvolvimento.
 
