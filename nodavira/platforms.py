@@ -22,7 +22,7 @@ def window_options(assets, platform=None):
     if platform == "win32":
         return {"gui": "edgechromium", "icon": str(assets / "app.ico")}
     if platform.startswith("linux"):
-        return {"gui": "gtk", "icon": str(assets / "favicon.svg")}
+        return {"gui": "gtk", "icon": str(assets / "app.png")}
     raise RuntimeError("A janela do Nodavira suporta Windows e Linux. Use --browser neste sistema.")
 
 
