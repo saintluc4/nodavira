@@ -1,5 +1,13 @@
 # Verificação — Nodavira
 
+## Interface bilíngue — 0.5.0
+
+Em 26/09/2026, os 53 testes automatizados passaram no Windows, incluindo persistência do idioma, cobertura dos textos, interpolação, tradução da API e preservação das medições originais. A interface foi inspecionada no navegador em inglês e português, incluindo configurações, metodologia, detalhes e restauração da preferência após recarregar.
+
+O executável independente carregou a janela WebView2 e completou 48/48 consultas via UDP, DoH e DoT em IPv4 e IPv6. DoH negociou HTTP/2; o controle negativo de certificado TLS foi rejeitado. Foram verificados os recursos de tradução incorporados, relatórios em inglês, exportação CSV com 49 linhas, cancelamento e encerramento. SHA-256 do executável: `409f4562e6c2f9ab6ebcf50a17afdb4168bc252db2d2e43152f9b37842bb4a3c`.
+
+O teste Linux de integração também verifica a alternância de idioma e a preferência XDG. A execução dos pacotes desta versão está sujeita aos checks do pull request no GitHub; os resultados anteriores estão registrados abaixo.
+
 ## Portabilidade Linux — código 0.4.0
 
 Em 24/09/2026, os **45 testes automatizados** passaram no ambiente Windows de desenvolvimento. Incluem seleção do renderer GTK, preservação das opções de segurança da janela, encerramento, caminhos XDG, DNS do sistema com stub local, permissões POSIX dos arquivos empacotados e exclusão de dados privados. Os testes da janela nesse conjunto usam um substituto controlado do pywebview; não equivalem à execução real do GTK.

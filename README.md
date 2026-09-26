@@ -293,7 +293,7 @@ nodavira/engine.py        # Protocolos, agendamento e estatísticas
 nodavira/server.py        # API local, exportação e relatórios
 nodavira/desktop.py       # Janela Windows/WebView2 ou Linux/GTK
 nodavira/platforms.py     # Renderer e diretório de relatórios por sistema
-static/                   # Interface em português
+static/                   # Interface em português e inglês
 tests/                    # Testes automatizados
 scripts/                  # Verificação, identidade e empacotamento
 brand/                    # Símbolo, lettering e banner editáveis
