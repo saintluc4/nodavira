@@ -67,5 +67,22 @@ class ServerTests(unittest.TestCase):
         self.assertIn('attachment', headers['Content-Disposition'])
         self.assertEqual(json.loads(body)['state'], 'idle')
 
+    def test_language_api_requires_auth_and_validates_values(self):
+        self.assertEqual(self.request('/api/preferences', token=False, body={'language':'en'})[0], 403)
+        self.assertEqual(self.request('/api/preferences', body={'language':'fr'})[0], 400)
+        self.assertEqual(self.request('/api/preferences', body={'language':['en']})[0], 400)
+        self.assertEqual(self.request('/api/preferences', body={'language':'en'})[0], 200)
+        self.assertEqual(json.loads(self.request('/api/config')[1])['language'], 'en')
+        self.assertEqual(json.loads(self.request()[1])['message'], 'Ready to start')
+        status, body, _ = self.request('/api/start', body={'resolvers':[]}, headers={'X-Nodavira-Language':'en'})
+        self.assertEqual(status, 400)
+        self.assertEqual(json.loads(body)['error'], 'Select between 1 and 32 servers.')
+        self.assertEqual(json.loads(self.request(headers={'X-Nodavira-Language':'pt-BR'})[1])['message'], 'Pronto para começar')
+        self.assertEqual(self.request('/api/preferences', body={'language':'pt-BR'})[0], 200)
+
+    def test_translation_assets_are_packaged_and_served(self):
+        self.assertEqual(self.request('/i18n.js')[0], 200)
+        self.assertEqual(json.loads(self.request('/en.json')[1])['Idioma'], 'Language')
+
 
 if __name__ == '__main__': unittest.main()

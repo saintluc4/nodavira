@@ -5,7 +5,7 @@ from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
-DOCUMENTS = ['README.md', 'METHODOLOGY.md', 'TESTING.md', 'THIRD_PARTY_NOTICES.md', 'BRAND.md', 'CONTRIBUTING.md',
+DOCUMENTS = ['README.md', 'README.en.md', 'METHODOLOGY.md', 'TESTING.md', 'THIRD_PARTY_NOTICES.md', 'BRAND.md', 'CONTRIBUTING.md',
              'requirements.txt', 'requirements-lock.txt', 'requirements-build.txt', 'requirements-linux-lock.txt']
 SOURCE_FILES = DOCUMENTS + ['LICENSE', '.gitignore', '.gitattributes', 'app.py', 'build.py', 'build.ps1']
 SOURCE_DIRECTORIES = ['nodavira', 'static', 'tests', 'scripts', 'packaging', 'licenses', 'brand', 'docs', '.github']

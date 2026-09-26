@@ -15,6 +15,7 @@ import webbrowser
 from nodavira.server import make_server
 from nodavira.desktop import run_window
 from nodavira.platforms import reports_directory, startup_error
+from nodavira.i18n import preferences_path
 
 
 def main():
@@ -26,7 +27,8 @@ def main():
     parser.add_argument("--session-file", type=Path)
     parser.add_argument("--hidden-window", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
-    server, state = make_server(ROOT / "static", reports_directory(ROOT), args.port)
+    server, state = make_server(ROOT / "static", reports_directory(ROOT), args.port,
+                               preferences_file=preferences_path())
     url = f"http://127.0.0.1:{server.server_port}/#token={state.token}"
     if args.session_file:
         args.session_file.write_text(json.dumps({"url": url, "port": server.server_port}), encoding="utf-8")

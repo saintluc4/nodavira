@@ -9,7 +9,7 @@ O alvo inicial do pacote Debian é **Ubuntu 24.04 ou posterior e Linux Mint 22 o
 Depois de obter o `.deb` da versão desejada, abra-o no instalador de aplicativos da distribuição ou execute, na pasta do download:
 
 ```bash
-sudo apt install ./nodavira_0.4.0-1_all.deb
+sudo apt install ./nodavira_0.5.0-1_all.deb
 ```
 
 O APT instala Python, PyGObject, GTK e WebKitGTK quando necessário. As bibliotecas Python do benchmark acompanham o pacote em uma pasta privada; não são instaladas no Python global via pip. É necessária conexão para obter dependências que ainda não estejam instaladas. Ubuntu 22.04 e Mint 21 não fazem parte do alvo inicial.
@@ -27,7 +27,7 @@ sudo apt remove nodavira
 O `PKGBUILD` utiliza `makepkg` e as dependências Python do Arch. Depois de obter o pacote construído pelo workflow Linux:
 
 ```bash
-sudo pacman -U ./nodavira-0.4.0-1-any.pkg.tar.zst
+sudo pacman -U ./nodavira-0.5.0-1-any.pkg.tar.zst
 nodavira
 ```
 
@@ -40,7 +40,7 @@ O pacote local não cria um repositório pacman. `pacman -S nodavira` só funcio
 O empacotamento gera um `PKGBUILD` com versão e SHA-256 do arquivo-fonte. O workflow Arch gera `.SRCINFO` usando `makepkg --printsrcinfo`. Para publicar:
 
 1. Valide os jobs Ubuntu e Arch do workflow Linux e teste a interface em uma sessão gráfica real.
-2. Publique `nodavira-0.4.0.tar.gz` na Release `v0.4.0`, com os bytes exatos usados para gerar o SHA-256 do `PKGBUILD`.
+2. Publique `nodavira-0.5.0.tar.gz` na Release `v0.5.0`, com os bytes exatos usados para gerar o SHA-256 do `PKGBUILD`.
 3. Verifique a disponibilidade do nome no AUR e prepare uma conta com chave SSH.
 4. Envie somente `PKGBUILD` e `.SRCINFO` ao repositório AUR correspondente, seguindo as regras do AUR.
 5. Após confirmar a publicação, documente `yay -S nodavira` como opção de instalação.

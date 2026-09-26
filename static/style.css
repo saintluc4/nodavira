@@ -1,4 +1,5 @@
 :root{--bg:#f7f5fb;--ink:#262135;--muted:#716b7e;--line:#e7e2ee;--accent:#6544c4;--success:#176b52;--accent-soft:#eee8fc;--nav:#201b32;--blue:#5077c6}
+.header-tools{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.language-control{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}.language-control select{width:auto;padding:6px 24px 6px 9px;border:1px solid var(--line);border-radius:7px;background:white;color:var(--ink)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:14px}
 button,input,textarea,select{font:inherit}

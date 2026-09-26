@@ -13,6 +13,8 @@ from urllib.parse import parse_qs, urlsplit
 from .config import DOMAINS, catalog, validate_config
 from .engine import Benchmark
 from . import __version__
+from .i18n import Preferences, translate, localize_report
+import sys
 
 
 def csv_report(report):
@@ -44,6 +46,7 @@ class AppState:
         self.last_seen = time.monotonic()
         self.output_dir = Path(output_dir)
         self.desktop = {"mode": "server", "renderer": None, "loaded": False}
+        self.report_language = lambda: 'pt-BR'
 
     def update(self, report):
         with self.lock:
@@ -76,7 +79,8 @@ class AppState:
                 self.output_dir.mkdir(parents=True, exist_ok=True)
                 stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
                 destination = self.output_dir / f"nodavira-{stamp}.json"
-                destination.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+                destination.write_text(json.dumps(localize_report(report, self.report_language()),
+                                                  ensure_ascii=False, indent=2), encoding="utf-8")
                 report["saved_to"] = str(destination)
             except OSError as exc:
                 report["save_error"] = f"Não foi possível salvar automaticamente: {exc}. Use Exportar."
@@ -87,9 +91,12 @@ class AppState:
             self.update(report)
 
 
-def make_server(static_dir, output_dir, port=0):
+def make_server(static_dir, output_dir, port=0, preferences_file=None):
     state = AppState(output_dir)
     static_dir = Path(static_dir)
+    preferences = Preferences(preferences_file or Path(output_dir) / 'preferences.json')
+    state.report_language = lambda: preferences.language
+    preference_lock = threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
@@ -116,6 +123,8 @@ def make_server(static_dir, output_dir, port=0):
             return secrets.compare_digest(token, state.token)
 
         def send(self, status, data, content_type="application/json; charset=utf-8", filename=None):
+            if isinstance(data, dict) and 'error' in data:
+                data = dict(data, error=translate(data['error'], self.language()))
             if not isinstance(data, bytes):
                 data = json.dumps(data, ensure_ascii=False).encode("utf-8")
             self.send_response(status)
@@ -133,6 +142,10 @@ def make_server(static_dir, output_dir, port=0):
             except (BrokenPipeError, ConnectionResetError):
                 pass
 
+        def language(self):
+            requested = self.headers.get('X-Nodavira-Language')
+            return requested if requested in ('en', 'pt-BR') else preferences.language
+
         def do_GET(self):
             path = urlsplit(self.path).path
             if path.startswith("/api/"):
@@ -140,16 +153,19 @@ def make_server(static_dir, output_dir, port=0):
                     return self.send(403, {"error": "Sessão inválida. Abra o aplicativo novamente."})
                 state.last_seen = time.monotonic()
                 if path == "/api/config":
-                    return self.send(200, {"domains": DOMAINS, "resolvers": catalog(), "version": __version__})
+                    return self.send(200, {"domains": DOMAINS, "resolvers": catalog(), "version": __version__,
+                                           "language": preferences.language, "platform": sys.platform})
                 if path == "/api/status":
-                    return self.send(200, state.snapshot())
+                    return self.send(200, localize_report(state.snapshot(), self.language()))
                 if path == "/api/export.json":
-                    return self.send(200, state.snapshot(True), filename="nodavira-resultados.json")
+                    return self.send(200, localize_report(state.snapshot(True), self.language()), filename="nodavira-results.json")
                 if path == "/api/export.csv":
-                    return self.send(200, csv_report(state.snapshot(True)), "text/csv; charset=utf-8", "nodavira-consultas.csv")
+                    return self.send(200, csv_report(localize_report(state.snapshot(True), self.language())), "text/csv; charset=utf-8", "nodavira-queries.csv")
                 return self.send(404, {"error": "Não encontrado"})
             files = {"/": ("index.html", "text/html; charset=utf-8"),
                      "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+                     "/i18n.js": ("i18n.js", "text/javascript; charset=utf-8"),
+                     "/en.json": ("en.json", "application/json; charset=utf-8"),
                      "/style.css": ("style.css", "text/css; charset=utf-8"),
                      "/favicon.svg": ("favicon.svg", "image/svg+xml"),
                      "/wordmark.svg": ("wordmark.svg", "image/svg+xml"),
@@ -171,7 +187,15 @@ def make_server(static_dir, output_dir, port=0):
                 data = json.loads(self.rfile.read(length))
                 state.last_seen = time.monotonic()
                 path = urlsplit(self.path).path
-                if path == "/api/start":
+                if path == "/api/preferences":
+                    if not isinstance(data, dict):
+                        raise ValueError('Configuração inválida.')
+                    try:
+                        with preference_lock:
+                            preferences.save(data.get('language'))
+                    except OSError:
+                        return self.send(500, {'error': 'Não foi possível salvar o idioma.'})
+                elif path == "/api/start":
                     state.start(validate_config(data))
                 elif path == "/api/stop":
                     state.stop.set()

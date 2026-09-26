@@ -1,23 +1,25 @@
 # Nodavira
 
+**Português** · [English](README.en.md)
+
 ![Nodavira — Clareza em cada consulta](brand/banner.svg)
 
 **Aplicativo open-source para Windows e Linux que compara resolvedores DNS com IPv4, IPv6, DNS over HTTPS e DNS over TLS.**
 
-**[Baixar Nodavira.exe](https://github.com/saintluc4/nodavira/releases/download/v0.3.2/Nodavira.exe)** · [Versões e requisitos](https://github.com/saintluc4/nodavira/releases) · [Reportar um problema](https://github.com/saintluc4/nodavira/issues/new/choose)
+**[Baixar Nodavira.exe](https://github.com/saintluc4/nodavira/releases/download/v0.5.0/Nodavira.exe)** · [Versões e requisitos](https://github.com/saintluc4/nodavira/releases) · [Reportar um problema](https://github.com/saintluc4/nodavira/issues/new/choose)
 
 Desenvolvi o Nodavira para comparar resolvedores DNS a partir da conexão em que eles serão utilizados. Meu objetivo é medir latência, variação e falhas com um conjunto de consultas conhecido, mantendo a metodologia e os resultados disponíveis para análise.
 
 Adotei consultas diretas aos resolvedores, suporte a transportes criptografados e uma lista de domínios personalizável. O aplicativo executa localmente, abre em uma **janela própria** e não modifica a configuração DNS do sistema. Disponibilizo o código, a documentação e os recursos visuais neste repositório. As bibliotecas utilizadas estão identificadas nos avisos de terceiros.
 
-**Versão do código: `0.4.0`, com suporte Linux validado em Ubuntu e Arch pelo GitHub Actions.** A distribuição Windows publicada é a `0.3.2`. O projeto está em desenvolvimento inicial. Trato o ranking como uma comparação exploratória das condições observadas durante o teste; ele não certifica a qualidade de um provedor nem prevê seu desempenho futuro.
+**Versão do código: `0.5.0`, com interface em português e inglês para Windows e Linux.** O projeto está em desenvolvimento inicial. Trato o ranking como uma comparação exploratória das condições observadas durante o teste; ele não certifica a qualidade de um provedor nem prevê seu desempenho futuro.
 
 Para **Ubuntu, Linux Mint e Arch**, documentei pacotes, requisitos e compilação no [guia Linux](docs/LINUX.md). O empacotamento Arch inclui um `PKGBUILD`; a publicação no AUR ainda está pendente.
 
 | Sistema | Arquivo para instalar |
 |---|---|
-| Ubuntu 24.04+ / Mint 22+ | `nodavira_0.4.0-1_all.deb`, instalado com `apt install ./arquivo.deb` |
-| Arch Linux | `nodavira-0.4.0-1-any.pkg.tar.zst`, instalado com `pacman -U ./arquivo.pkg.tar.zst` |
+| Ubuntu 24.04+ / Mint 22+ | `nodavira_0.5.0-1_all.deb`, instalado com `apt install ./arquivo.deb` |
+| Arch Linux | `nodavira-0.5.0-1-any.pkg.tar.zst`, instalado com `pacman -U ./arquivo.pkg.tar.zst` |
 
 Os pacotes Linux são produzidos pelo [workflow Linux packages](https://github.com/saintluc4/nodavira/actions/workflows/linux.yml) para distribuição nas [Releases](https://github.com/saintluc4/nodavira/releases). Os requisitos do sistema são resolvidos pelo gerenciador de pacotes. A validação automatizada no Ubuntu é a referência para o Mint; ainda não houve teste manual no desktop do Mint.
 
@@ -56,11 +58,17 @@ Mantive o símbolo, o lettering vetorial e a paleta em arquivos editáveis. O me
 | Testes personalizados | Servidores, domínios, passagens, concorrência e timeout configuráveis |
 | Importação | TXT ou hostnames extraídos localmente de um HAR |
 | Exportação | JSON completo e CSV com uma linha por consulta |
-| Interface | Português, janela Windows/WebView2 ou Linux/GTK e opção de execução no navegador |
+| Interface | Português e inglês, janela Windows/WebView2 ou Linux/GTK e opção de execução no navegador |
+
+## Idioma
+
+Use o seletor **Idioma / Language** no topo da janela para alternar entre português e inglês sem reiniciar nem alterar a configuração da medição. A escolha fica salva em `%APPDATA%/nodavira/preferences.json` no Windows e em `$XDG_CONFIG_HOME/nodavira/preferences.json` no Linux (padrão: `~/.config/nodavira/preferences.json`). No primeiro uso, sistemas com idioma português usam português; os demais usam inglês.
+
+Menus, metodologia, detalhes, progresso e mensagens de validação são traduzidos. Os identificadores técnicos do JSON/CSV, nomes personalizados, domínios e valores medidos permanecem estáveis. Textos de licenças e diagnósticos de bibliotecas externas mantêm o idioma original. A lista de domínios não muda com o idioma e inclui serviços brasileiros; personalize-a para representar sua rotina.
 
 ## Usar o executável
 
-Para utilizar o aplicativo, baixe **[Nodavira.exe](https://github.com/saintluc4/nodavira/releases/download/v0.3.2/Nodavira.exe)**. O executável inclui o interpretador Python e as bibliotecas do projeto; não é necessário baixar o código-fonte ou instalar Python.
+Para utilizar o aplicativo, baixe **[Nodavira.exe](https://github.com/saintluc4/nodavira/releases/download/v0.5.0/Nodavira.exe)**. O executável inclui o interpretador Python e as bibliotecas do projeto; não é necessário baixar o código-fonte ou instalar Python.
 
 1. Salve `Nodavira.exe` em uma pasta com permissão de escrita.
 2. Abra o arquivo com dois cliques.
@@ -285,7 +293,7 @@ nodavira/engine.py        # Protocolos, agendamento e estatísticas
 nodavira/server.py        # API local, exportação e relatórios
 nodavira/desktop.py       # Janela Windows/WebView2 ou Linux/GTK
 nodavira/platforms.py     # Renderer e diretório de relatórios por sistema
-static/                   # Interface em português
+static/                   # Interface em português e inglês
 tests/                    # Testes automatizados
 scripts/                  # Verificação, identidade e empacotamento
 brand/                    # Símbolo, lettering e banner editáveis
