@@ -27,6 +27,17 @@ def window_options(assets, platform=None):
 
 
 def startup_error(exc):
+    from .i18n import Preferences, preferences_path
+    if Preferences(preferences_path()).language == 'en':
+        if sys.platform == 'win32':
+            hint = ('The window requires Microsoft Edge WebView2 Runtime and .NET Framework 4.6.2 or later.\n'
+                    'WebView2: https://developer.microsoft.com/microsoft-edge/webview2/\n'
+                    'Alternative: Nodavira.exe --browser.')
+        else:
+            hint = ('The Linux window requires a graphical session, GTK 3, PyGObject and WebKitGTK 4.1.\n'
+                    'See docs/LINUX.md to install dependencies.\n'
+                    'Alternative: nodavira --browser (or python3 app.py --browser from source).')
+        return f'Could not start Nodavira.\n\n{hint}\n\nDetails: {type(exc).__name__}: {exc}'
     if sys.platform == "win32":
         hint = ("A janela requer Microsoft Edge WebView2 Runtime e .NET Framework 4.6.2 ou superior.\n"
                 "WebView2: https://developer.microsoft.com/microsoft-edge/webview2/\n"
