@@ -50,7 +50,8 @@ def main():
     try:
         with tempfile.TemporaryDirectory(prefix='nodavira-smoke-') as directory:
             folder=Path(directory);session=folder/'session.json'
-            env=dict(os.environ,XDG_DATA_HOME=str(folder/'data'),PYTHONDONTWRITEBYTECODE='1')
+            env=dict(os.environ,XDG_DATA_HOME=str(folder/'data'),XDG_CONFIG_HOME=str(folder/'config'),
+                     PYTHONDONTWRITEBYTECODE='1')
             command=args.command+['--session-file',str(session),
                                   '--hidden-window' if args.desktop else '--no-browser']
             with (folder/'process.log').open('w+',encoding='utf-8') as log:
@@ -88,6 +89,9 @@ def main():
                         raise AssertionError('Unauthenticated request accepted')
                     except urllib.error.HTTPError as error:
                         assert error.code==403,error.code
+                    api('preferences', {'language':'en'})
+                    assert api('config')['language']=='en'
+                    assert api('status')['message']=='Ready to start'
                     api('start',{'domains':['example.com','iana.org'],'qtypes':['A'],
                         'rounds':2,'concurrency':2,'timeout_ms':500,
                         'resolvers':[{'name':'Loopback test','protocol':'udp','address':'127.0.0.1',
@@ -96,11 +100,17 @@ def main():
                     report=api('export.json')
                     assert report['state']=='complete',report['state']
                     assert report['completed']==4,report['completed']
+                    assert report['message']=='Benchmark complete.'
+                    assert report['language']=='en'
                     assert report['rows'][0]['success']==4,report['rows']
                     assert len(api('export.csv').decode('utf-8-sig').splitlines())==5
                     saved=until(lambda:api('status').get('saved_to'))
                     assert Path(saved).is_relative_to(folder/'data/nodavira/reports'),saved
                     assert Path(saved).is_file()
+                    assert json.loads(Path(saved).read_text())['language']=='en'
+                    assert json.loads((folder/'config/nodavira/preferences.json').read_text())['language']=='en'
+                    api('preferences', {'language':'pt-BR'})
+                    assert api('status')['message']=='Benchmark concluído.'
                     with urllib.request.urlopen(base+'/notices.txt',timeout=5) as response:
                         assert b'MIT License' in response.read()
                     api('shutdown',{})

@@ -1,5 +1,6 @@
 """End-to-end verification of the self-contained binary in an isolated folder."""
 import hashlib
+import os
 import json
 import shutil
 import subprocess
@@ -18,6 +19,7 @@ binary=folder/'Nodavira.exe'
 shutil.copyfile(ROOT/'dist/Nodavira.exe',binary)
 session=folder/f'session-{time.time_ns()}.json'
 process=subprocess.Popen([str(binary),'--hidden-window','--session-file',str(session)],cwd=folder,
+                         env=dict(os.environ, APPDATA=str(folder/'preferences')),
                          creationflags=subprocess.CREATE_NO_WINDOW)
 token=None
 
@@ -58,6 +60,12 @@ try:
         bundled_notices=response.read()
     assert bundled_notices==(ROOT/'static/notices.txt').read_bytes(), 'Bundled license notices differ'
     config=api('config')
+    api('preferences', {'language':'en'})
+    assert api('config')['language']=='en'
+    assert api('status')['message']=='Ready to start'
+    for asset in ('en.json','i18n.js'):
+        with urllib.request.urlopen(base+'/'+asset, timeout=10) as response:
+            assert response.read()==(ROOT/'static'/asset).read_bytes()
     resolvers=[r for r in config['resolvers'] if r['name']=='Cloudflare']
     negative=dict(next(r for r in resolvers if r['protocol']=='dot' and r['family']=='IPv4'))
     negative.update(name='TLS hostname validation (negative control)',hostname='invalid.example.org')
@@ -67,6 +75,8 @@ try:
     assert result['state']=='complete',result
     actual=api('export.json')
     assert actual['completed']==48,actual['completed']
+    assert actual['language']=='en'
+    assert actual['message']=='Benchmark complete.'
     for row in actual['rows']:
         if row['name'].startswith('TLS hostname'):
             assert not row['available'] and row['score_ms'] is None,row
